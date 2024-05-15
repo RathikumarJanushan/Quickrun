@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "928391976860",
+    "project_id": "quickrun-8a241",
+    "storage_bucket": "quickrun-8a241.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928391976860:android:3ad38533b2e768eda65a59",
+        "android_client_info": {
+          "package_name": "com.example.quickrun"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ0xvuh03Fi0LIwCZJlSYMo7052LydupI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

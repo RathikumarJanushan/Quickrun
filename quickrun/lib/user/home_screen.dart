@@ -8,9 +8,20 @@ import 'package:quickrun/user/map.dart';
 import 'package:quickrun/user/order.dart';
 import 'package:quickrun/user/report.dart';
 import 'package:quickrun/widgets/button.dart' as DeleveryButton;
+import 'package:geolocator/geolocator.dart';
+import 'package:quickrun/user/saveLocation.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
+
+  void getLocation() async {
+    await Geolocator.checkPermission();
+    await Geolocator.requestPermission();
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    print(position);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +58,18 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
+            ListTile(
+              title: Text('Location'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LocationPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(title: Text('loc'), onTap: getLocation),
             ListTile(
               title: Text('Report'),
               onTap: () {

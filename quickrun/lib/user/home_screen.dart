@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickrun/auth/auth_service.dart';
 import 'package:quickrun/auth/login_screen.dart';
-import 'package:quickrun/user/map.dart';
+import 'package:quickrun/user/qr.dart';
 import 'package:quickrun/user/order.dart';
 import 'package:quickrun/user/report.dart';
 import 'package:quickrun/widgets/button.dart' as DeleveryButton;
@@ -174,11 +174,10 @@ class HomeScreen extends StatelessWidget {
                   ));
                 } else {
                   // If availability is not "start", proceed with action
-                  await checkAvailabilityAndPerformAction("start", context);
-                  await _StartTime("start");
+
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => GoogleMapPage()),
+                    MaterialPageRoute(builder: (context) => qrCode()),
                   );
                 }
               },
@@ -308,51 +307,6 @@ class HomeScreen extends StatelessWidget {
             'email': userEmail,
           });
           print('User document created with availability: $availability');
-        }
-      } else {
-        print('User not logged in!');
-      }
-    } catch (e) {
-      print('Error updating availability: $e');
-    }
-  }
-
-  Future<void> _StartTime(String availability) async {
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        final userId = user.uid;
-        final userEmail = user.email;
-
-        final startTimeRef =
-            FirebaseFirestore.instance.collection('StartTime').doc(userId);
-
-        final startTimeDoc = await startTimeRef.get();
-        if (startTimeDoc.exists) {
-          if (availability == 'start') {
-            // Save start time in Firestore
-            await startTimeRef.set({
-              'startTime': Timestamp.now(), // Save current time as startTime
-              'email': userEmail, // Update email if necessary
-            });
-            print('Start time saved successfully!');
-          } else {
-            print('Start time document found but availability is not start.');
-          }
-        } else {
-          print('Start time document not found. Creating new document...');
-          if (availability == 'start') {
-            // Save start time in Firestore
-            await startTimeRef.set({
-              'startTime': Timestamp.now(), // Save current time as startTime
-              'email': userEmail, // Update email if necessary
-            });
-            print('Start time document created.');
-            print('Start time saved successfully!');
-          } else {
-            print(
-                'Start time document not found and availability is not start.');
-          }
         }
       } else {
         print('User not logged in!');

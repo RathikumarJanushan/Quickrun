@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:quickrun/admin/brakeUser.dart';
+import 'package:quickrun/admin/cal2.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -230,28 +231,25 @@ class UserOptionsPage extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  await _updateAvailability(
-                      userId, 'break', userEmail); // Pass userEmail parameter
+                  await _updateAvailability(userId, 'break', userEmail);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => calculation(
+                        userName: userName,
+                        userId: userId,
+                        userEmail: userEmail,
+                        docId: docId, // Pass docId here
+                      ),
+                    ),
+                  );
+                  // Pass userEmail parameter
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(16.0),
                 ),
                 child: Text(
                   'Break',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ),
-              SizedBox(height: 12.0),
-              ElevatedButton(
-                onPressed: () async {
-                  await _updateAvailability(
-                      userId, 'start', userEmail); // Pass userEmail parameter
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.all(16.0),
-                ),
-                child: Text(
-                  'Start',
                   style: TextStyle(fontSize: 16.0),
                 ),
               ),

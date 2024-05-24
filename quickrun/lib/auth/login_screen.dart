@@ -87,6 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(builder: (context) => const AdminhomeomeScreen()),
       );
+
   _login() async {
     print("Attempting login with email: ${_email.text}");
     final user =

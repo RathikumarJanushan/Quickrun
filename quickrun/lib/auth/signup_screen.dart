@@ -169,6 +169,7 @@ class _SignupScreenState extends State<SignupScreen> {
           .set({
         'name': name,
         'email': email,
+        'userId': userId,
       });
 
       // For demonstration, let's just log the user details

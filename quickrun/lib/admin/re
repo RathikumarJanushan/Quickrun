@@ -1,0 +1,140 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Add this line to use DateFormat
+
+class WorkingTimeScreen extends StatefulWidget {
+  final String userId;
+
+  WorkingTimeScreen({required this.userId});
+
+  @override
+  _WorkingTimeScreenState createState() => _WorkingTimeScreenState();
+}
+
+class _WorkingTimeScreenState extends State<WorkingTimeScreen> {
+  int? selectedMonth;
+  Future<List<Map<String, dynamic>>>? workingTimeFuture;
+
+  Future<List<Map<String, dynamic>>> _getWorkingTimeDetails(
+      String userId, int month) async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('workingtime')
+        .where('userId', isEqualTo: userId)
+        .get();
+
+    return querySnapshot.docs
+        .map((doc) => doc.data() as Map<String, dynamic>)
+        .where((data) {
+      Timestamp timestamp = data['date'];
+      DateTime date = timestamp.toDate();
+      return date.month == month;
+    }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Working Time Details"),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: DropdownButton<int>(
+              hint: Text("Select Month"),
+              value: selectedMonth,
+              items: List.generate(
+                  12,
+                  (index) => DropdownMenuItem(
+                        child: Text(
+                            DateFormat.MMMM().format(DateTime(0, index + 1))),
+                        value: index + 1,
+                      )),
+              onChanged: (value) {
+                setState(() {
+                  selectedMonth = value;
+                  if (value != null) {
+                    workingTimeFuture =
+                        _getWorkingTimeDetails(widget.userId, value);
+                  }
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: selectedMonth == null
+                ? Center(child: Text("Please select a month"))
+                : FutureBuilder<List<Map<String, dynamic>>>(
+                    future: workingTimeFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error: ${snapshot.error}"));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Text(
+                                "No working time records found for the selected month"));
+                      } else {
+                        final workingTimeData = snapshot.data!;
+                        double totalHours = 0;
+
+                        workingTimeData.forEach((record) {
+                          totalHours += record['differenceInHours'];
+                          totalHours += record['differenceInMinutes'] / 60;
+                        });
+
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: DataTable(
+                                  columns: [
+                                    DataColumn(label: Text("Date")),
+                                    DataColumn(label: Text("Hours")),
+                                    DataColumn(label: Text("Minutes")),
+                                    DataColumn(label: Text("UserID")),
+                                  ],
+                                  rows: workingTimeData.map((record) {
+                                    Timestamp timestamp = record['date'];
+                                    DateTime date = timestamp.toDate();
+                                    return DataRow(
+                                      cells: [
+                                        DataCell(Text(DateFormat.yMMMd()
+                                            .add_jm()
+                                            .format(date))),
+                                        DataCell(Text(
+                                            record['differenceInHours']
+                                                .toString())),
+                                        DataCell(Text(
+                                            record['differenceInMinutes']
+                                                .toString())),
+                                        DataCell(
+                                            Text(record['userId'].toString())),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                "Total Hours: ${totalHours.toStringAsFixed(2)}",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}

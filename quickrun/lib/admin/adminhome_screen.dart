@@ -6,6 +6,7 @@ import 'package:quickrun/auth/login_screen.dart';
 import 'package:quickrun/widgets/button.dart';
 import 'package:quickrun/admin/availableUser.dart';
 import 'package:quickrun/admin/report.dart';
+import 'package:quickrun/admin/report2.dart';
 
 class AdminhomeomeScreen extends StatelessWidget {
   const AdminhomeomeScreen({super.key});
@@ -48,7 +49,16 @@ class AdminhomeomeScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => report()),
+                  MaterialPageRoute(builder: (context) => AllUsersScreen()),
+                );
+              },
+            ),
+            ListTile(
+              title: Text('View Report2'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => report2()),
                 );
               },
             ),
@@ -69,7 +79,7 @@ class AdminhomeomeScreen extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-                "images/background_image.jpg"), // Path to your background image
+                "assets/background.png"), // Path to your background image
             fit: BoxFit.cover,
           ),
         ),

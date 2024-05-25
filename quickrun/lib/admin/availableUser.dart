@@ -257,8 +257,23 @@ class UserOptionsPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () async {
                   await _updateAvailability(
-                      userId, 'end', userEmail); // Pass userEmail parameter
+                      userId, 'end', userEmail);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => calculation(
+                        userName: userName,
+                        userId: userId,
+                        userEmail: userEmail,
+                        docId: docId, // Pass docId here
+                      ),
+                    ),
+                  );
+                      
+                       // Pass userEmail parameter
                 },
+
+
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(16.0),
                 ),

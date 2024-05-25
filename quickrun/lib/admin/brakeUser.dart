@@ -63,21 +63,6 @@ class brakepage extends StatelessWidget {
                   style: TextStyle(fontSize: 16.0),
                 ),
               ),
-              SizedBox(height: 12.0),
-              ElevatedButton(
-                onPressed: () async {
-                  await _cal(userId);
-                  await _updateAvailability(userId, 'end', userEmail);
-                  // Pass userEmail parameter
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.all(16.0),
-                ),
-                child: Text(
-                  'End',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-              ),
             ],
           ),
         ),

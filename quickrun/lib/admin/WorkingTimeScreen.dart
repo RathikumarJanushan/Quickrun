@@ -17,6 +17,24 @@ class WorkingTimeScreen extends StatefulWidget {
 class _WorkingTimeScreenState extends State<WorkingTimeScreen> {
   int? selectedMonth;
   Future<List<Map<String, dynamic>>>? workingTimeFuture;
+  Map<String, dynamic>? userDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserDetails(widget.userId);
+  }
+
+  Future<void> _getUserDetails(String userId) async {
+    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+        .collection('usersdetails')
+        .doc(userId)
+        .get();
+
+    setState(() {
+      userDetails = userSnapshot.data() as Map<String, dynamic>?;
+    });
+  }
 
   Future<List<Map<String, dynamic>>> _getWorkingTimeDetails(
       String userId, int month) async {
@@ -54,6 +72,13 @@ class _WorkingTimeScreenState extends State<WorkingTimeScreen> {
                   style: pw.TextStyle(
                       fontSize: 24, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 16),
+              pw.Text('Name: ${userDetails?['name'] ?? ''}',
+                  style: pw.TextStyle(fontSize: 18)),
+              pw.Text('Email: ${userDetails?['email'] ?? ''}',
+                  style: pw.TextStyle(fontSize: 18)),
+              pw.Text('User ID: ${widget.userId}',
+                  style: pw.TextStyle(fontSize: 18)),
+              pw.SizedBox(height: 16),
               pw.Table.fromTextArray(
                 headers: ['Date', 'Hours', 'Minutes', 'UserID'],
                 data: data.map((record) {
@@ -89,29 +114,45 @@ class _WorkingTimeScreenState extends State<WorkingTimeScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: DropdownButton<int>(
-              hint: Text("Select Month"),
-              value: selectedMonth,
-              items: List.generate(
-                  12,
-                  (index) => DropdownMenuItem(
-                        child: Text(
-                            DateFormat.MMMM().format(DateTime(0, index + 1))),
-                        value: index + 1,
-                      )),
-              onChanged: (value) {
-                setState(() {
-                  selectedMonth = value;
-                  if (value != null) {
-                    workingTimeFuture =
-                        _getWorkingTimeDetails(widget.userId, value);
-                  }
-                });
-              },
+          if (userDetails != null) ...[
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Name: ${userDetails!['name']}",
+                      style: TextStyle(fontSize: 18)),
+                  Text("Email: ${userDetails!['email']}",
+                      style: TextStyle(fontSize: 18)),
+                  Text("User ID: ${widget.userId}",
+                      style: TextStyle(fontSize: 18)),
+                ],
+              ),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<int>(
+                hint: Text("Select Month"),
+                value: selectedMonth,
+                items: List.generate(
+                    12,
+                    (index) => DropdownMenuItem(
+                          child: Text(
+                              DateFormat.MMMM().format(DateTime(0, index + 1))),
+                          value: index + 1,
+                        )),
+                onChanged: (value) {
+                  setState(() {
+                    selectedMonth = value;
+                    if (value != null) {
+                      workingTimeFuture =
+                          _getWorkingTimeDetails(widget.userId, value);
+                    }
+                  });
+                },
+              ),
+            ),
+          ],
           if (selectedMonth != null)
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(

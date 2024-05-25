@@ -37,7 +37,11 @@ class HomeScreen extends StatelessWidget {
           children: [
             DrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue,
+                gradient: LinearGradient(
+                  colors: [Colors.blue, Colors.lightBlueAccent],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
               child: Text(
                 'Menu',
@@ -69,7 +73,6 @@ class HomeScreen extends StatelessWidget {
                 );
               },
             ),
-            ListTile(title: Text('loc'), onTap: getLocation),
             ListTile(
               title: Text('Report'),
               onTap: () {
@@ -84,145 +87,155 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('available')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<DocumentSnapshot> snapshot) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF00C9FF), Color(0xFF92FE9D)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              StreamBuilder<DocumentSnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('available')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
 
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
 
-                final availability = snapshot.data!['available'];
-                Color notificationColor = Colors.grey; // Default color
+                  final availability = snapshot.data!['available'];
+                  Color notificationColor = Colors.grey; // Default color
 
-                if (availability == 'end') {
-                  notificationColor = Colors.red;
-                } else if (availability == 'start') {
-                  notificationColor = Colors.green;
-                } else if (availability == 'break') {
-                  notificationColor = Colors.orange;
-                }
+                  if (availability == 'end') {
+                    notificationColor = Colors.red;
+                  } else if (availability == 'start') {
+                    notificationColor = Colors.green;
+                  } else if (availability == 'break') {
+                    notificationColor = Colors.orange;
+                  }
 
-                return Container(
-                  padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: notificationColor,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Welcome,',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                  return Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: notificationColor,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Welcome,',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        '${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
+                        SizedBox(height: 10),
+                        Text(
+                          '${FirebaseAuth.instance.currentUser?.email ?? 'User'}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Text(
-                        'Your availability status is:',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
+                        SizedBox(height: 10),
+                        Text(
+                          'Your availability status is:',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '$availability',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                        Text(
+                          '$availability',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-            SizedBox(height: 20),
-            DeleveryButton.CustomButton(
-              label: "Start",
-              onPressed: () async {
-                // Check current availability
-                final availability = await getCurrentAvailability();
-                if (availability != null && availability == 'start') {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Your availability is already "start".'),
-                    duration: Duration(seconds: 2),
-                  ));
-                } else {
-                  // If availability is not "start", proceed with action
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => qrCode()),
+                      ],
+                    ),
                   );
-                }
-              },
-              buttonColor: Color.fromARGB(255, 21, 142, 235),
-              textColor: Colors.white,
-            ),
-            SizedBox(height: 10),
-            DeleveryButton.CustomButton(
-              label: "End",
-              onPressed: () async {
-                // Check current availability
-                final availability = await getCurrentAvailability();
-                if (availability != null && availability == 'end') {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Your availability is already "end".'),
-                    duration: Duration(seconds: 2),
-                  ));
-                } else {
-                  // If availability is not "end", proceed with action
-                  await checkAvailabilityAndPerformAction("end", context);
-                  Navigator.push(
+                },
+              ),
+              SizedBox(height: 20),
+              DeleveryButton.CustomButton(
+                label: "Start",
+                onPressed: () async {
+                  // Check current availability
+                  final availability = await getCurrentAvailability();
+                  if (availability != null && availability == 'start') {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Your availability is already "start".'),
+                      duration: Duration(seconds: 2),
+                    ));
+                  } else {
+                    // If availability is not "start", proceed with action
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => qrCode()),
+                    );
+                  }
+                },
+                buttonColor: Color.fromARGB(255, 21, 142, 235),
+                textColor: Colors.white,
+              ),
+              SizedBox(height: 10),
+              DeleveryButton.CustomButton(
+                label: "End",
+                onPressed: () async {
+                  // Check current availability
+                  final availability = await getCurrentAvailability();
+                  if (availability != null && availability == 'end') {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Your availability is already "end".'),
+                      duration: Duration(seconds: 2),
+                    ));
+                  } else {
+                    // If availability is not "end", proceed with action
+                    await checkAvailabilityAndPerformAction('end', context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FirestoreExample()),
+                    );
+                  }
+                },
+                buttonColor: Color.fromARGB(255, 21, 142, 235),
+                textColor: Colors.white,
+              ),
+              SizedBox(height: 20),
+              DeleveryButton.CustomButton(
+                label: "Sign Out",
+                onPressed: () async {
+                  await auth.signout();
+                  Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => FirestoreExample()),
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(),
+                    ),
                   );
-                }
-              },
-              buttonColor: Color.fromARGB(255, 21, 142, 235),
-              textColor: Colors.white,
-            ),
-            SizedBox(height: 20),
-            DeleveryButton.CustomButton(
-              label: "Sign Out",
-              onPressed: () async {
-                await auth.signout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginScreen(),
-                  ),
-                );
-              },
-              buttonColor: Colors.blue,
-              textColor: Colors.white,
-            ),
-          ],
+                },
+                buttonColor: Colors.blue,
+                textColor: Colors.white,
+              ),
+            ],
+          ),
         ),
       ),
     );

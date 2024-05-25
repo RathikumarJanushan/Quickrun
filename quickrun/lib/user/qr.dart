@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:quickrun/user/home_screen.dart';
 
 class qrCode extends StatelessWidget {
   @override
@@ -75,7 +76,7 @@ class _QRViewExampleState extends State<QRViewExample> {
         await _StartTime("start");
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => WelcomePage()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     });
@@ -196,19 +197,5 @@ class _QRViewExampleState extends State<QRViewExample> {
     } catch (e) {
       print('Error updating availability: $e');
     }
-  }
-}
-
-class WelcomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome Page'),
-      ),
-      body: Center(
-        child: Text('Welcome!'),
-      ),
-    );
   }
 }

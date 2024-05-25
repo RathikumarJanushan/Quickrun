@@ -34,55 +34,72 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
-        child: Column(
-          children: [
-            const Spacer(),
-            const Text(
-              "Signup",
-              style: TextStyle(fontSize: 40, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 50),
-            CustomTextField(
-              hint: "Enter Name",
-              label: "Name",
-              controller: _name,
-            ),
-            const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Enter Email",
-              label: "Email",
-              controller: _email,
-            ),
-            const SizedBox(height: 20),
-            CustomTextField(
-              hint: "Enter Password",
-              label: "Password",
-              isPassword: true,
-              controller: _password,
-            ),
-            const SizedBox(height: 30),
-            CustomButton(
-              label: "Signup",
-              onPressed: _signup,
-            ),
-            const SizedBox(height: 5),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF00C9FF), Color(0xFF92FE9D)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const Text("Already have an account? "),
-                InkWell(
-                  onTap: () => goToLogin(context),
-                  child: const Text(
-                    "Login",
-                    style: TextStyle(color: Colors.red),
+                const Text(
+                  "Signup",
+                  style: TextStyle(
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
-                )
+                ),
+                const SizedBox(height: 50),
+                CustomTextField(
+                  hint: "Enter Name",
+                  label: "Name",
+                  controller: _name,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  hint: "Enter Email",
+                  label: "Email",
+                  controller: _email,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  hint: "Enter Password",
+                  label: "Password",
+                  isPassword: true,
+                  controller: _password,
+                ),
+                const SizedBox(height: 30),
+                CustomButton(
+                  label: "Signup",
+                  onPressed: _signup,
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Already have an account? ",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    InkWell(
+                      onTap: () => goToLogin(context),
+                      child: const Text(
+                        "Login",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
-            const Spacer()
-          ],
+          ),
         ),
       ),
     );
@@ -97,6 +114,7 @@ class _SignupScreenState extends State<SignupScreen> {
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
+
   _signup() async {
     // Check if any field is empty
     if (_name.text.isEmpty || _email.text.isEmpty || _password.text.isEmpty) {
@@ -118,7 +136,7 @@ class _SignupScreenState extends State<SignupScreen> {
         log("User Created Successfully");
 
         // Save additional user details to the database (e.g., name)
-        _saveUserDetails(user.uid, _name.text, _email.text);
+        await _saveUserDetails(user.uid, _name.text, _email.text);
 
         // Navigate to home screen
         goToHome(context);

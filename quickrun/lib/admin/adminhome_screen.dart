@@ -54,15 +54,6 @@ class AdminhomeomeScreen extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text('View Report2'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => report2()),
-                );
-              },
-            ),
-            ListTile(
               title: Text('Sign Out'),
               onTap: () async {
                 await auth.signout();
